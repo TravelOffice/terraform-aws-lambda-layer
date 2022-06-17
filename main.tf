@@ -1,17 +1,17 @@
 variable "LAMBDA_LAYERS" {
-    description = "List params of lambda layers"
+  description = "List params of lambda layers"
 }
 variable "ENV" {
-    description = "Environment"
+  description = "Environment"
 }
 variable "FEATURE_NAME" {
-    description = "Feature name"
+  description = "Feature name"
 }
 variable "S3_BUCKET" {
   default = "codepipeline-artifacts20220108172710412300000001"
 }
 variable "TAGS" {
-    description = "List tags"
+  description = "List tags"
 }
 locals {
   root_path = format("%s/../../..", path.root)
@@ -30,7 +30,7 @@ data "external" "layer_zip" {
 }
 
 ## TODO: Temporary disable cause by codebuild upload error
-resource "aws_s3_bucket_object" "layer_object" {
+resource "aws_s3_object" "layer_object" {
   for_each    = var.LAMBDA_LAYERS
   bucket      = var.S3_BUCKET
   key         = "execution/${var.ENV}-${var.FEATURE_NAME}-${each.key}-layer"
@@ -45,7 +45,7 @@ resource "aws_lambda_layer_version" "layer" {
 
   ## TODO: Temporary disable cause by codebuild upload error
   s3_bucket        = var.S3_BUCKET
-  s3_key           = aws_s3_bucket_object.layer_object[each.key].id
+  s3_key           = aws_s3_object.layer_object[each.key].id
   source_code_hash = data.external.layer_zip[each.key].result.hash
 
   compatible_runtimes      = ["nodejs14.x"]
