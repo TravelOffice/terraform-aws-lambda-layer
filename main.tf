@@ -8,7 +8,7 @@ variable "FEATURE_NAME" {
   description = "Feature name"
 }
 variable "S3_BUCKET" {
-  default = "codepipeline-artifacts20220108172710412300000001"
+  default = "suni-codepipeline-artifacts"
 }
 variable "TAGS" {
   description = "List tags"
