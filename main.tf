@@ -1,13 +1,28 @@
-data "http" "infra" {
-  url = "https://raw.githubusercontent.com/TravelOffice/infrastructure-constant/master/${var.ENV}-infrastructure.json"
+variable "DEV_SCM_CONSTANT_ARN" {
+  default = "arn:aws:secretsmanager:ap-southeast-1:087112488386:secret:dev-infrastructure-constant-91TPFe"
 }
+
+variable "PROD_SCM_CONSTANT_ARN" {
+  default = "arn:aws:secretsmanager:ap-southeast-1:800823848420:secret:prod-infrastructure-constant-FEt8TM"
+}
+
+
+variable "ENV" {
+  description = "Environment"
+}
+data "aws_secretsmanager_secret" "secrets" {
+  arn = var.ENV == "dev" ? var.DEV_SCM_CONSTANT_ARN : var.PROD_SCM_CONSTANT_ARN
+}
+
+data "aws_secretsmanager_secret_version" "current" {
+  secret_id = data.aws_secretsmanager_secret.secrets.id
+}
+
 
 variable "LAMBDA_LAYERS" {
   description = "List params of lambda layers"
 }
-variable "ENV" {
-  description = "Environment"
-}
+
 variable "FEATURE_NAME" {
   description = "Feature name"
 }
@@ -19,7 +34,7 @@ locals {
 }
 
 locals {
-  constants = jsondecode(data.http.infra.body)
+  constants = jsondecode(data.aws_secretsmanager_secret_version.current.secret_string)
   s3_bucket = local.constants["CODEPIPELINE_BUCKET"]
 }
 data "external" "layer_zip" {
