@@ -68,7 +68,7 @@ resource "aws_lambda_layer_version" "layer" {
   s3_key           = aws_s3_object.layer_object[each.key].id
   source_code_hash = data.external.layer_zip[each.key].result.hash
 
-  compatible_runtimes      = ["nodejs14.x"]
+  compatible_runtimes      = ["nodejs18.x"]
   compatible_architectures = ["arm64"]
 }
 
